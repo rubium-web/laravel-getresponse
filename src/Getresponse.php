@@ -25,7 +25,17 @@ class Getresponse
     public function __construct($config)
     {
         $this->config = $config;
-        $this->client = GetresponseClientFactory::createWithApiKey($this->config['api_key']);
+        if ($this->config['enterprise']) {
+            if (empty($this->config['api_key']) || empty($this->config['domain'])) {
+                throw new \Exception('GETRESPONSE_API_KEY or GETRESPONSE_API_DOMAIN is empty');
+            }
+            $this->client = GetresponseClientFactory::createEnterprisePLWithApiKey($this->config['api_key'], $this->config['domain']);
+        } else {
+            if (empty($this->config['api_key'])) {
+                throw new \Exception('GETRESPONSE_API_KEY is empty');
+            }
+            $this->client = GetresponseClientFactory::createWithApiKey($this->config['api_key']);
+        }
     }
 
     public function deleteContact($code)
